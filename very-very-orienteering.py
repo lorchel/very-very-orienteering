@@ -26,12 +26,6 @@ try:
 except ImportError:
     import pickle
 
-#from IPython import embed
-#import sys
-#from IPython.core import ultratb
-#sys.excepthook = ultratb.FormattedTB(mode='Verbose',
-#                                     color_scheme='LightBG', call_pdb=1)
-
 _TIME_CLICK = 0.2
 
 class Point(collections.namedtuple('Point', 'x y')):
