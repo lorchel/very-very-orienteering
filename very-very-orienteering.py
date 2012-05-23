@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+#-------------------------------------------------------------------
+# Filename: very-very-orienteering.py
+#  Purpose: Very-Very-Orienteering Map Generator
+#   Author: Tom Richter
+#    Email: lorchel@gmx.de
+#  License: GPLv3
+#
+# Copyright (C) 2012 Tom Richter
+#---------------------------------------------------------------------
 
 from PIL import Image
 from matplotlib.lines import Line2D
