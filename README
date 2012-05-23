@@ -1,0 +1,66 @@
+Very-Very-Orienteering Map Generator
+************************************
+
+This is a Very-Very-Orienteering Map Generator. If you don't know these kind of
+orienteering training: Try it out! It's fun!
+Just export your orienteering map to an image file and use the filename as
+argument. Then create some controls in the map by simply clicking and rotate
+the controls in the other window by dragging the connecting lines. The maps
+can be saved in a tar file with the same name as the image hitting Shift-S.
+Inside the tar you'll find:
+   - the original map
+   - a full training map with your route
+   - a training map with windows around the controls
+   - the very-very-map basically a window map with rotated windows
+   - and some pickled data (for loading the session later)
+
+The session can be loaded again by giving the tar filename as argument.
+Be careful, because it will be overridden when changes are saved via Shift-S.
+
+Here comes a description of arguments and actions which can be performed 
+in the session:
+
+positional arguments:
+  file             Filename of picture or tar file previously saved with Shift-S
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -r, --rotate     Rotate picture by 90 degrees (ignored with a tar file)
+  -l, --landscape  Axes will be arranged upon each other and not next to each other
+
+Actions which can be performed in window with original map:
+   * Create new controls by simply clicking
+   * Dragging control
+   * Insert a control between two controls (by clicking on a line)
+   * Exchange two controls by dragging one control over another control
+
+Actions which can be performed in the window with the very-very map:
+   * Redraw the map by right-click (Map is not automatically redrawn by changes
+     in the other window)
+   * Move start control by dragging it
+   * Rotate controls by dragging the connections   
+   
+Actions with the sliders:
+   * Change size of controls
+   * Change line width of controls and lines
+   * Change transparency of controls and lines
+   * Change radius of windows
+
+Actions with keys:
+   * Shift-S (or big S): Save maps and the whole instance in a tar file
+
+Actions with pylab toolbar:
+   * Zooming, paning, etc. - just try
+
+
+Requirements
+************
+   * python 2.7
+   * python-matplotlib
+   * python-PIL
+   * python-numpy
+   * python-scipy
+
+Installation
+************
+Download and run very-very-orienteering.py
