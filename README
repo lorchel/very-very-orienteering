@@ -1,5 +1,5 @@
 Very-Very-Orienteering Map Generator
-************************************
+====================================
 
 This is a Very-Very-Orienteering Map Generator. If you don't know these kind of
 orienteering training: Try it out! It's fun!
@@ -24,26 +24,20 @@ Shift-S. Inside the tar you'll find:
 The session can be loaded again by giving the tar filename as argument.
 Be careful, because it will be overridden when changes are saved via Shift-S.
 
-
 Requirements
 ------------
-
    * python 2.7
    * python-matplotlib
    * python-PIL
    * python-numpy
    * python-scipy
 
-
 Installation
 ------------
-
 Clone or download (ZIP button on git website) the repository,
 assure that the very-very-orienteering.py is executable and
 run "very-very-orienteering.py -h" for help with the command-line arguments.
 
-
 Known bugs and ToDos
 --------------------
-
 See starting comments in main file.
