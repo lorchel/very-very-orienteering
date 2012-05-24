@@ -35,9 +35,13 @@ Requirements
 Installation
 ------------
 Clone or download (ZIP button on git website) the repository,
-assure that the very-very-orienteering.py is executable and
+assure that the file very-very-orienteering.py is executable and
 run "very-very-orienteering.py -h" for help with the command-line arguments.
 
 Known bugs and ToDos
 --------------------
-See starting comments in main file.
+See starting comments in file very-very-orienteering.py.
+
+Thanks
+------
+Thanks to Magic for introducing me to Very-Very-OL aka Very-Very-Orienteering!
