@@ -414,7 +414,6 @@ class VeryVeryOrienteering(object):
     def onpick(self, event):
         if self.tb.mode != '':
             return
-        #print 'op', event.name
         self.pick = 'none'
         if isinstance(event.artist, Patch):
             self.pick = 'control'
