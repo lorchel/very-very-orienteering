@@ -8,6 +8,41 @@
 #
 # Copyright (C) 2012 Tom Richter
 #---------------------------------------------------------------------
+"""
+Very-Very-Orienteering Map Generator
+====================================
+
+This is a Very-Very-Orienteering Map Generator. If you don't know these kind of
+orienteering training: Try it out! It's fun!
+
+It works like an window or compass orienteering with rotated windows. That means
+after finding the control by running in its direction, the runner has to
+observe the surroundings and find out which direction is North or rather in
+which direction is the next control.
+ 
+To generate your map just export your orienteering map to an image file and use
+the filename as argument. Then create some controls in the map by simply
+clicking. After that rotate the controls in the other window by dragging the
+connecting lines.
+The maps can be saved in a tar file with the same name as the image hitting
+Shift-S. Inside the tar you'll find:
+   - the original map
+   - a full training map with your route
+   - a training map with windows around the controls
+   - the very-very-orienteering map
+   - and some pickled data (for loading the session later)
+
+The session can be loaded again by giving the tar filename as argument.
+Be careful, because it will be overridden when changes are saved via Shift-S.
+"""
+
+#TODO Bug with indexing in plot_map2 -> Sometimes the indexes returned by
+#     ind_boxes don't have the same size.
+#TODO Line width now changes with figure size -> not practical at all when
+#     exporting maps
+#TODO Possibility to automatically put last control on start with button or
+#     checkbox
+#TODO Possibility to create shortcuts  
 
 from PIL import Image
 from matplotlib.lines import Line2D
@@ -147,7 +182,7 @@ class Control(object):
 class VeryVeryOrienteering(object):
     def __init__(self, ax1, ax2):
         """
-        Main class - I am to lazy to document...
+        Main class for generating very-very-orienteering maps.
         """
         self.ax1 = ax1
         self.ax2 = ax2
@@ -453,12 +488,8 @@ class VeryVeryOrienteering(object):
         self.fig1.savefig(fn_im2, bbox_inches=extent1, dpi=dpi)
         print('2...')
         # Window orienteering map
-#        for control in self.controls:
-#            control.rotation = 0
         self.plot_map2(very_very=False)
         self.fig2.savefig(fn_im3, bbox_inches=extent2, dpi=dpi)
-#        for i, control in enumerate(self.controls):
-#            control.rotation = rots[i]
         print('3...')
         # Finally very-very-orienteering map
         self.plot_map2()
@@ -510,26 +541,7 @@ class VeryVeryOrienteering(object):
 if __name__ == '__main__':
     import argparse
     from matplotlib.widgets import Slider
-    description = """
-Very-Very-Orienteering Map Generator
-************************************
-
-This is a Very-Very-Orienteering Map Generator. If you don't know these kind of
-orienteering training: Try it out! It's fun!
-Just export your orienteering map to an image file and use the filename as
-argument. Then create some controls in the map by simply clicking and rotate
-the controls in the other window by dragging the connecting lines. The maps
-can be saved in a tar file with the same name as the image hitting Shift-S.
-Inside the tar you'll find:
-   - the original map
-   - a full training map with your route
-   - a training map with windows around the controls
-   - the very-very-map basically a window map with rotated windows
-   - and some pickled data (for loading the session later)
-
-The session can be loaded again by giving the tar filename as argument.
-Be careful, because it will be overridden when changes are saved via Shift-S.
-
+    description = __doc__ + """
 Here comes a description of arguments and actions which can be performed 
 in the session:"""
     epilog = """
@@ -538,6 +550,7 @@ Actions which can be performed in window with original map:
    * Dragging control
    * Insert a control between two controls (by clicking on a line)
    * Exchange two controls by dragging one control over another control
+   * Delete control by right-click
 
 Actions which can be performed in the window with the very-very map:
    * Redraw the map by right-click (Map is not automatically redrawn by changes

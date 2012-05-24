@@ -3,15 +3,22 @@ Very-Very-Orienteering Map Generator
 
 This is a Very-Very-Orienteering Map Generator. If you don't know these kind of
 orienteering training: Try it out! It's fun!
-Just export your orienteering map to an image file and use the filename as
-argument. Then create some controls in the map by simply clicking and rotate
-the controls in the other window by dragging the connecting lines. The maps
-can be saved in a tar file with the same name as the image hitting Shift-S.
-Inside the tar you'll find:
+
+It works like an window or compass orienteering with rotated windows. That means
+after finding the control by running in its direction, the runner has to
+observe the surroundings and find out which direction is North or rather in
+which direction is the next control.
+ 
+To generate your map just export your orienteering map to an image file and use
+the filename as argument. Then create some controls in the map by simply
+clicking. After that rotate the controls in the other window by dragging the
+connecting lines.
+The maps can be saved in a tar file with the same name as the image hitting
+Shift-S. Inside the tar you'll find:
    - the original map
    - a full training map with your route
    - a training map with windows around the controls
-   - the very-very-map basically a window map with rotated windows
+   - the very-very-orienteering map
    - and some pickled data (for loading the session later)
 
 The session can be loaded again by giving the tar filename as argument.
@@ -19,7 +26,7 @@ Be careful, because it will be overridden when changes are saved via Shift-S.
 
 
 Requirements
-************
+------------
 
    * python 2.7
    * python-matplotlib
@@ -27,8 +34,16 @@ Requirements
    * python-numpy
    * python-scipy
 
-   
-Installation
-************
 
-Download and run "very-very-orienteering.py -h" for help
+Installation
+------------
+
+Clone or download (ZIP button on git website) the repository,
+assure that the very-very-orienteering.py is executable and
+run "very-very-orienteering.py -h" for help with the command-line arguments.
+
+
+Known bugs and ToDos
+--------------------
+
+See starting comments in main file.
