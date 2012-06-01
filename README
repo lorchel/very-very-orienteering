@@ -27,16 +27,23 @@ Be careful, because it will be overridden when changes are saved via Shift-S.
 Requirements
 ------------
    * python 2.7
-   * python-matplotlib
-   * python-PIL
-   * python-numpy
-   * python-scipy
+     * python-matplotlib
+     * python-PIL
+     * python-numpy
+     * python-scipy
 
 Installation
 ------------
-Clone or download (ZIP button on git website) the repository,
-assure that the file very-very-orienteering.py is executable and
-run "very-very-orienteering.py -h" for help with the command-line arguments.
+You have 2 possibilities when python is installed:
+   1. - Install requirements
+      - Clone or download (ZIP button on git website) the repository
+      - and run "python very-very-orienteering.py -h" for usage information
+      - or make the file very-very-orienteering.py executable
+      - and run "very-very-orienteering.py -h" for usage information
+   2. - Clone or download (ZIP button on git website) the repository
+      - Install script and requirements with root privileges and "python setup.py install"
+      - Run "very-very-o -h" for usage information
+      - If everything is working you can delete the downloaded files
 
 Known bugs and ToDos
 --------------------
