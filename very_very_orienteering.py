@@ -263,7 +263,7 @@ class VeryVeryOrienteering(object):
             try:
                 window[indc] = 255
             except IndexError as ex:
-                print 'Some controls are outside the window."
+                print('Some controls are outside the window.')
                 continue
             self.map2[indb2] = window
             if control.is_start:
@@ -602,10 +602,10 @@ Actions with pylab toolbar:
     axwindow = fig.add_axes([0.2, 0.03, 0.35, 0.01], axisbg=axcolor)
     axlw = fig.add_axes([0.7, 0.06, 0.15, 0.01], axisbg=axcolor)
     axalpha = fig.add_axes([0.7, 0.03, 0.15, 0.01], axisbg=axcolor)
-    sradius = Slider(axradius, 'Radius', 5, 200, valinit=50)
-    swindow = Slider(axwindow, 'Window', 5, 500, valinit=150)
-    slw = Slider(axlw, 'Lw', 0.5, 5.0, valinit=2.0)
-    salpha = Slider(axalpha, 'Alpha', 0.0, 1.0, valinit=0.7)
+    sradius = Slider(axradius, 'Radius', 5, 200, valinit=vvo.radius)
+    swindow = Slider(axwindow, 'Window', 5, 500, valinit=vvo.window_radius)
+    slw = Slider(axlw, 'Lw', 0.5, 5.0, valinit=vvo.c_kwargs['lw'])
+    salpha = Slider(axalpha, 'Alpha', 0.0, 1.0, valinit=vvo.c_kwargs['alpha'])
     sradius.on_changed(vvo.change_control_radius)
     swindow.on_changed(vvo.change_window_radius)
     slw.on_changed(vvo.change_lw)
