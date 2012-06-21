@@ -236,7 +236,7 @@ class VeryVeryOrienteering(object):
             self.ax2.lines.remove(line)
         xy2 = self.xy2
         xy = None
-        self.map2[:] = 0
+        self.map2[:] = 255
         size = Point(*self.map.shape[:2][::-1])
         dif_orientation = 0
         radius = self.window_radius
@@ -262,7 +262,7 @@ class VeryVeryOrienteering(object):
             window = rotate(window, -dif_orientation / pi * 180, axes=(1, 0), reshape=False)
             size_window = Point(*window.shape[:2][::-1])
             indc = ind_circle(size_window, size_window / 2., radius)
-            window[indc] = 0
+            window[indc] = 255
             self.map2[indb2] = window
 
             if control.is_start:
@@ -272,7 +272,7 @@ class VeryVeryOrienteering(object):
             else:
                 patch = Circle(xy2, ** self.c_kwargs)
             self.ax2.add_patch(patch)
-        self.imax2.set_data(self.map2)
+        self.imax2.set_data(self.map2[::self.low_res, ::self.low_res])
 
     def get_control(self, patch):
         """Return control which corresponds to the given patch"""
@@ -486,7 +486,11 @@ class VeryVeryOrienteering(object):
         extent2 = self.ax2.get_window_extent().transformed(self.fig2.dpi_scale_trans.inverted())
         corners = extent1.get_points()
         dpi = self.map.shape[0] / (corners[1, 1] - corners[0, 1])
+        self.imax.set_data(self.map)
         self.fig1.savefig(fn_im2, bbox_inches=extent1, dpi=dpi)
+        self.imax.set_data(self.map[::self.low_res, ::self.low_res])
+        orig_low_res = self.low_res
+        self.low_res = 1
         print('2...')
         # Window orienteering map
         self.plot_map2(very_very=False)
@@ -503,6 +507,8 @@ class VeryVeryOrienteering(object):
         os.remove(fn_im2)
         os.remove(fn_im3)
         os.remove(fn_im4)
+        self.low_res = orig_low_res
+        self.plot_map2()
         print('Finished saving.')
 
     def load(self, filename, rotate=False):
@@ -522,11 +528,13 @@ class VeryVeryOrienteering(object):
             self.map = np.array(Image.open(filename))[::-1, :]
             if rotate:
                 self.map = np.rot90(self.map)
-        self.map2 = np.zeros_like(self.map)
-        self.imax = self.ax1.imshow(self.map, aspect='equal',
-                                    interpolation='none', origin='lower')
-        self.imax2 = self.ax2.imshow(self.map2, aspect='equal',
-                                    interpolation='none', origin='lower')
+        self.map2 = np.ones_like(self.map) * 255
+        self.low_res = max(1, min(self.map.shape[0:2]) // 1000)
+        extent = (-0.5, self.map.shape[1] - 0.5, -0.5, self.map.shape[0] - 0.5)
+        self.imax = self.ax1.imshow(self.map[::self.low_res, ::self.low_res], aspect='equal',
+                                    interpolation='none', origin='lower', extent=extent)
+        self.imax2 = self.ax2.imshow(self.map2[::self.low_res, ::self.low_res], aspect='equal',
+                                    interpolation='none', origin='lower', extent=extent)
         self.ax2.set_aspect('equal')
         self.ax2.set_xlim(self.ax1.get_xlim())
         self.ax2.set_ylim(self.ax1.get_ylim())
