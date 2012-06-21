@@ -36,8 +36,6 @@ The session can be loaded again by giving the tar filename as argument.
 Be careful, because it will be overridden when changes are saved via Shift-S.
 """
 
-#TODO Bug with indexing in plot_map2 -> Sometimes the indexes returned by
-#     ind_boxes don't have the same size.
 #TODO Line width now changes with figure size -> not practical at all when
 #     exporting maps
 #TODO Possibility to automatically put last control on start with button or
@@ -262,9 +260,12 @@ class VeryVeryOrienteering(object):
             window = rotate(window, -dif_orientation / pi * 180, axes=(1, 0), reshape=False)
             size_window = Point(*window.shape[:2][::-1])
             indc = ind_circle(size_window, size_window / 2., radius)
-            window[indc] = 255
+            try:
+                window[indc] = 255
+            except IndexError as ex:
+                print 'Some controls are outside the window."
+                continue
             self.map2[indb2] = window
-
             if control.is_start:
                 self.t_kwargs['orientation'] += control.rotation * very_very
                 patch = RegularPolygon(xy2, 3, ** self.t_kwargs)
@@ -437,7 +438,7 @@ class VeryVeryOrienteering(object):
         self.draw()
 
     def change_window_radius(self, radius):
-        self.window_radius = radius
+        self.window_radius = int(radius)
         self.plot_map2()
         self.draw(2)
 
