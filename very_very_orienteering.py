@@ -62,6 +62,7 @@ except ImportError:
     import pickle
 
 _TIME_CLICK = 0.2
+_PICKER = 10
 
 class VVOError(Exception):
     pass
@@ -211,9 +212,9 @@ class VeryVeryOrienteering(object):
         self.xy2 = None
         self.radius = 52
         self.window_radius = 150
-        self.c_kwargs = dict(fc='none', ec='red', picker=30, radius=50, lw=2, alpha=0.7)
-        self.t_kwargs = dict(fc='none', ec='red', picker=30, radius=50, lw=2, alpha=0.7, orientation=pi)
-        self.l_kwargs = dict(color='red', picker=5, lw=2, alpha=0.7)
+        self.c_kwargs = dict(fc='none', ec='red', picker=_PICKER, radius=50, lw=2, alpha=0.7)
+        self.t_kwargs = dict(fc='none', ec='red', picker=_PICKER, radius=50, lw=2, alpha=0.7, orientation=pi)
+        self.l_kwargs = dict(color='red', picker=0.5 * _PICKER, lw=2, alpha=0.7)
         self.pick_artist = None
         self.pick = 'none'
         self.map2 = self.map = None
@@ -377,14 +378,16 @@ class VeryVeryOrienteering(object):
 
 
     def onclick(self, event):
-        if self.tb.mode != '':
+        if self.tb.mode != '' and event.button in (1, 3):
             return
         self.mouse_inaxes = event.inaxes
         self.time_of_onclick = time()
 
     def onrelease(self, event):
-        if self.tb.mode != '' or self.mouse_inaxes != event.inaxes:
+        if (self.tb.mode != '' and event.button in (1, 3) or
+            self.mouse_inaxes != event.inaxes):
             return
+        b1 = 2 if self.tb.mode != '' else 1
         if event.inaxes:
             coords = Point(x=event.xdata, y=event.ydata)
         just_click = time() - self.time_of_onclick < _TIME_CLICK
@@ -395,7 +398,7 @@ class VeryVeryOrienteering(object):
             first = self.pick
             self.ax1.pick(event)
 
-        if event.inaxes == self.ax1 and just_click and event.button == 1:
+        if event.inaxes == self.ax1 and just_click and event.button == b1:
             if first == 'none':
                 self.create_control(coords)
                 self.draw(1)
@@ -405,14 +408,14 @@ class VeryVeryOrienteering(object):
         if event.inaxes == self.ax1 and just_click and event.button == 3 and first == 'control':
                 self.delete_control(first_picked)
                 self.draw(1)
-        if event.inaxes == self.ax1 and not just_click and event.button == 1:
+        if event.inaxes == self.ax1 and not just_click and event.button == b1:
             if first == self.pick == 'control' and  self.pick_artist != first_picked:
                 self.change_controls(first_picked, self.pick_artist)
                 self.draw(1)
             elif first == 'control':
                 self.move_control(coords, first_picked)
                 self.draw(1)
-        if event.inaxes == self.ax2 and not just_click and event.button == 1:
+        if event.inaxes == self.ax2 and not just_click and event.button == b1:
             if first == 'line':
                 self.change_orientation(first_picked, coords)
                 self.plot_map2()
@@ -428,7 +431,7 @@ class VeryVeryOrienteering(object):
         self.pick_artist = None
 
     def onpick(self, event):
-        if self.tb.mode != '':
+        if self.tb.mode != '' and event.button in (1, 3):
             return
         self.pick = 'none'
         if isinstance(event.artist, Patch):
@@ -446,7 +449,7 @@ class VeryVeryOrienteering(object):
     def change_control_radius(self, radius):
         self.c_kwargs['radius'] = self.t_kwargs['radius'] = radius
         self.radius = radius + self.c_kwargs['lw']
-        self.l_kwargs['picker'] = self.c_kwargs['picker'] = 0.6 * radius
+        #self.l_kwargs['picker'] = self.c_kwargs['picker'] = 0.5*_PICKER
         self.update_all()
         self.draw()
 
@@ -580,6 +583,8 @@ class VeryVeryOrienteering(object):
              self.radius, self.window_radius,
              self.c_kwargs, self.t_kwargs, self.l_kwargs,
              self.scale) = unpickled
+            self.c_kwargs['picker'] = self.t_kwargs['picker'] = _PICKER
+            self.l_kwargs['picker'] = 0.5 * _PICKER
             for i in range(len(xys)):
                 self.create_control(xys[i], rotation=rots[i])
             self.plot_map2()
@@ -617,6 +622,9 @@ Actions with keys:
 
 Actions with pylab toolbar:
    * Zooming, paning, etc. - just try
+   * If you activated a tool, the tool will react on left-click and right-click
+   * All the left-click actions are than accessible via middle-click
+   * Right-click actions are not accessible when in toolbar mode
     """
     parser = argparse.ArgumentParser(
                         description=description, epilog=epilog,
