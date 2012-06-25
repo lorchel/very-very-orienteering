@@ -63,6 +63,9 @@ except ImportError:
 
 _TIME_CLICK = 0.2
 
+class VVOError(Exception):
+    pass
+
 class Point(collections.namedtuple('Point', 'x y')):
     """Class representing a point"""
     __slots__ = ()
@@ -215,10 +218,20 @@ class VeryVeryOrienteering(object):
         self.pick = 'none'
         self.map2 = self.map = None
         self.imay2 = self.imax = None
+        self.scale = None
+        self.dpi = None
+
+        self.text1 = self.ax1.annotate('', (0.99, 0.01),
+                                       xycoords='axes fraction',
+                                       va='bottom', ha='right')
+        self.text2 = self.ax2.annotate('', (0.99, 0.01),
+                                       xycoords='axes fraction',
+                                       va='bottom', ha='right')
 
 
     def draw(self, fig= -1):
         """Redraw canvas of the figures of the axes"""
+        self.print_distance()
         if self.fig1 == self.fig2 or fig != 2:
             self.fig1.canvas.draw()
         if self.fig1 != self.fig2 and fig != 1:
@@ -457,6 +470,14 @@ class VeryVeryOrienteering(object):
         self.update_all()
         self.draw()
 
+    def print_distance(self):
+        if self.scale and self.dpi:
+            dist = sum(distance(self.controls[i].xy, self.controls[i + 1].xy)
+                      for i in range(len(self.controls) - 1))
+            dist = 1.*dist / self.dpi * 2.54 * self.scale / 100 / 1000
+            self.text1.set_text('%.1fkm' % dist)
+            self.text2.set_text('%.1fkm' % dist)
+
     def update_all(self):
         for control in self.controls:
             self.move_control(None, control)
@@ -476,11 +497,16 @@ class VeryVeryOrienteering(object):
         rots = [c.rotation for c in self.controls]
         to_pickle = (xys, self.xy2, rots,
                      self.radius, self.window_radius,
-                     self.c_kwargs, self.t_kwargs, self.l_kwargs)
+                     self.c_kwargs, self.t_kwargs, self.l_kwargs,
+                     self.scale)
         with open(fn_pickle, 'w') as f:
             pickle.dump(to_pickle, f)
         # Original map
-        Image.fromarray(self.map[::-1, :]).save(fn_im1)
+        image = Image.fromarray(self.map[::-1, :])
+        if self.dpi:
+            image.save(fn_im1, dpi=(self.dpi, self.dpi))
+        else:
+            image.save(fn_im1)
         print('1...')
         # Map with route
         extent1 = self.ax1.get_window_extent().transformed(self.fig1.dpi_scale_trans.inverted())
@@ -512,7 +538,17 @@ class VeryVeryOrienteering(object):
         self.plot_map2()
         print('Finished saving.')
 
-    def load(self, filename, rotate=False):
+    def load_image(self, filename):
+        image = Image.open(filename)
+        try:
+            image.load()
+        except IOError as ex:
+            raise VVOError('PIL Error: %s. Please install decoder.' % ex)
+        self.dpi = image.info['dpi'][0] if image.info.has_key('dpi') else None
+        map = np.asarray(image)
+        self.map = np.asarray(image)[::-1, :]
+
+    def load(self, filename, rotate=False, scale=None):
         """Load image or tar file"""
         if tarfile.is_tarfile(filename):
             with tarfile.open(filename) as tar:
@@ -520,13 +556,13 @@ class VeryVeryOrienteering(object):
                 fn_pickle = [fn for fn in tar.getnames() if fn.endswith('.pickle')][0]
                 tar.extract(fn_im)
                 tar.extract(fn_pickle)
-            self.map = np.array(Image.open(fn_im))[::-1, :]
+            self.load_image(fn_im)
             with open(fn_pickle) as f:
                 unpickled = pickle.load(f)
             os.remove(fn_im)
             os.remove(fn_pickle)
         else:
-            self.map = np.array(Image.open(filename))[::-1, :]
+            self.load_image(filename)
             if rotate:
                 self.map = np.rot90(self.map)
         self.map2 = np.ones_like(self.map) * 255
@@ -542,10 +578,14 @@ class VeryVeryOrienteering(object):
         if tarfile.is_tarfile(filename):
             (xys, self.xy2, rots,
              self.radius, self.window_radius,
-             self.c_kwargs, self.t_kwargs, self.l_kwargs) = unpickled
+             self.c_kwargs, self.t_kwargs, self.l_kwargs,
+             self.scale) = unpickled
             for i in range(len(xys)):
                 self.create_control(xys[i], rotation=rots[i])
             self.plot_map2()
+        if scale:
+            self.scale = scale
+        self.print_distance()
 
 
 def main():
@@ -590,12 +630,15 @@ Actions with pylab toolbar:
     parser.add_argument(
         '-l', '--landscape', action='store_true',
         help='Axes will be arranged upon each other and not next to each other')
+    parser.add_argument(
+        '-s', '--scale', type=int,
+        help='Set scale of map to 1:scale')
     args = parser.parse_args()
     fig = plt.figure()
     ax1 = fig.add_subplot(1 + args.landscape, 1 + (not args.landscape), 1)
     ax2 = fig.add_subplot(1 + args.landscape, 1 + (not args.landscape), 2)
     vvo = VeryVeryOrienteering(ax1, ax2)
-    vvo.load(args.file, rotate=args.rotate)
+    vvo.load(args.file, rotate=args.rotate, scale=args.scale)
     # Create sliders and connnect the to vvo methods
     axcolor = 'lightgoldenrodyellow'
     axradius = fig.add_axes([0.2, 0.06, 0.35, 0.01], axisbg=axcolor)
