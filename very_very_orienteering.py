@@ -42,6 +42,7 @@ Be careful, because it will be overridden when changes are saved via Shift-S.
 #     checkbox
 #TODO Possibility to create shortcuts  
 
+from __future__ import print_function
 from PIL import Image
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, RegularPolygon, Patch
@@ -54,6 +55,7 @@ import collections
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 import tarfile
 import tempfile
 try:
@@ -486,7 +488,7 @@ class VeryVeryOrienteering(object):
             self.move_control(None, control)
         self.plot_map2()
 
-    def set_visible(axes=None):
+    def set_visible(self, axes=None):
         for ax in self.fig1.axes + self.fig2.axes:
             if axes is None or ax in axes:
                 ax.set_visible(True)
@@ -496,7 +498,8 @@ class VeryVeryOrienteering(object):
 
     def save(self, filename):
         """Save tar file with all relevant maps and pickled data"""
-        print('Saving ... this can take a while ...')
+        print('Saving in progress .', end='')
+        sys.stdout.flush()
         fn_pickle = filename + '_data.pickle'
         img_ext = '.png'
         fn_im1 = filename + '_map' + img_ext
@@ -513,30 +516,54 @@ class VeryVeryOrienteering(object):
         with open(fn_pickle, 'w') as f:
             pickle.dump(to_pickle, f)
         # Original map
-        image = Image.fromarray(self.map[::-1, :])
-        if self.dpi:
-            image.save(fn_im1, dpi=(self.dpi, self.dpi))
-        else:
-            image.save(fn_im1)
-        print('1...')
-        # Map with route
-        extent1 = self.ax1.get_window_extent().transformed(self.fig1.dpi_scale_trans.inverted())
-        extent2 = self.ax2.get_window_extent().transformed(self.fig2.dpi_scale_trans.inverted())
-        corners = extent1.get_points()
-        dpi = self.map.shape[0] / (corners[1, 1] - corners[0, 1])
-        self.imax.set_data(self.map)
-        self.fig1.savefig(fn_im2, bbox_inches=extent1, dpi=dpi)
-        self.imax.set_data(self.map[::self.low_res, ::self.low_res])
+        dpi = self.dpi
+        Image.fromarray(self.map[::-1, :]).save(fn_im1, dpi=(dpi, dpi))
+
+        # Set new fig size and plot ax above whole figure
+        # so that the saved image has the same shape and dpi as original image 
+        fig1_orig_size = self.fig1.get_size_inches()
+        fig2_orig_size = self.fig2.get_size_inches()
+        ax1_orig_pos = self.ax1.get_position()
+        ax2_orig_pos = self.ax2.get_position()
         orig_low_res = self.low_res
+        new_size = 1.*self.map.shape[1] / dpi, 1.*self.map.shape[0] / dpi
+        new_pos = (0, 0, 1, 1)
+        self.fig1.set_size_inches(new_size)
+        self.fig2.set_size_inches(new_size)
+        self.ax1.set_position(new_pos)
+        self.ax2.set_position(new_pos)
         self.low_res = 1
-        print('2...')
+
+        print('.', end='')
+        sys.stdout.flush()
+        # Map with route
+        self.set_visible((self.ax1,))
+        self.imax.set_data(self.map)
+        self.fig1.savefig(fn_im2, dpi=dpi)
+        self.imax.set_data(self.map[::orig_low_res, ::orig_low_res])
+
+        print('.', end='')
+        sys.stdout.flush()
         # Window orienteering map
+        self.set_visible((self.ax2,))
         self.plot_map2(very_very=False)
-        self.fig2.savefig(fn_im3, bbox_inches=extent2, dpi=dpi)
-        print('3...')
+        self.fig2.savefig(fn_im3, dpi=dpi)
+
+        print('.', end='')
+        sys.stdout.flush()
         # Finally very-very-orienteering map
         self.plot_map2()
-        self.fig2.savefig(fn_im4, bbox_inches=extent2, dpi=dpi)
+        self.fig2.savefig(fn_im4, dpi=dpi)
+
+        self.fig1.set_size_inches(fig1_orig_size)
+        self.fig2.set_size_inches(fig2_orig_size)
+        self.ax1.set_position(ax1_orig_pos)
+        self.ax2.set_position(ax2_orig_pos)
+        self.set_visible()
+        self.low_res = orig_low_res
+        self.plot_map2()
+
+        # Pack all stuff together in a tar file
         with tarfile.open(filename + '.tar', 'w') as tar:
             for name in [fn_pickle, fn_im1, fn_im2, fn_im3, fn_im4]:
                 tar.add(name)
@@ -545,9 +572,7 @@ class VeryVeryOrienteering(object):
         os.remove(fn_im2)
         os.remove(fn_im3)
         os.remove(fn_im4)
-        self.low_res = orig_low_res
-        self.plot_map2()
-        print('Finished saving.')
+        print(' finished.')
 
     def load_image(self, filename):
         image = Image.open(filename)
@@ -652,7 +677,7 @@ Actions with pylab toolbar:
         '-s', '--scale', type=int,
         help='Set scale of map to 1:scale')
     parser.add_argument(
-        '-d', '--dpi', type=float, default=300.
+        '-d', '--dpi', type=float, default=300.,
         help='Set dpi if not in metadata of image (default: 300.)')
     args = parser.parse_args()
     fig = plt.figure()
