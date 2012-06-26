@@ -486,6 +486,14 @@ class VeryVeryOrienteering(object):
             self.move_control(None, control)
         self.plot_map2()
 
+    def set_visible(axes=None):
+        for ax in self.fig1.axes + self.fig2.axes:
+            if axes is None or ax in axes:
+                ax.set_visible(True)
+            else:
+                ax.set_visible(False)
+
+
     def save(self, filename):
         """Save tar file with all relevant maps and pickled data"""
         print('Saving ... this can take a while ...')
@@ -547,12 +555,14 @@ class VeryVeryOrienteering(object):
             image.load()
         except IOError as ex:
             raise VVOError('PIL Error: %s. Please install decoder.' % ex)
-        self.dpi = image.info['dpi'][0] if image.info.has_key('dpi') else None
+        if image.info.has_key('dpi'):
+            self.dpi = image.info['dpi'][0]
         map = np.asarray(image)
         self.map = np.asarray(image)[::-1, :]
 
-    def load(self, filename, rotate=False, scale=None):
+    def load(self, filename, rotate=False, scale=None, dpi=None):
         """Load image or tar file"""
+        self.dpi = dpi
         if tarfile.is_tarfile(filename):
             with tarfile.open(filename) as tar:
                 fn_im = [fn for fn in tar.getnames() if '_map' in fn][0]
@@ -641,12 +651,15 @@ Actions with pylab toolbar:
     parser.add_argument(
         '-s', '--scale', type=int,
         help='Set scale of map to 1:scale')
+    parser.add_argument(
+        '-d', '--dpi', type=float, default=300.
+        help='Set dpi if not in metadata of image (default: 300.)')
     args = parser.parse_args()
     fig = plt.figure()
     ax1 = fig.add_subplot(1 + args.landscape, 1 + (not args.landscape), 1)
     ax2 = fig.add_subplot(1 + args.landscape, 1 + (not args.landscape), 2)
     vvo = VeryVeryOrienteering(ax1, ax2)
-    vvo.load(args.file, rotate=args.rotate, scale=args.scale)
+    vvo.load(args.file, rotate=args.rotate, scale=args.scale, dpi=args.dpi)
     # Create sliders and connnect the to vvo methods
     axcolor = 'lightgoldenrodyellow'
     axradius = fig.add_axes([0.2, 0.06, 0.35, 0.01], axisbg=axcolor)
