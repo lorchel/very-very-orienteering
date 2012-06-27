@@ -691,10 +691,14 @@ Actions with pylab toolbar:
     axwindow = fig.add_axes([0.2, 0.03, 0.35, 0.01], axisbg=axcolor)
     axlw = fig.add_axes([0.7, 0.06, 0.15, 0.01], axisbg=axcolor)
     axalpha = fig.add_axes([0.7, 0.03, 0.15, 0.01], axisbg=axcolor)
-    sradius = Slider(axradius, 'Radius', 5, 200, valinit=vvo.radius)
-    swindow = Slider(axwindow, 'Window', 5, 500, valinit=vvo.window_radius)
-    slw = Slider(axlw, 'Lw', 0.5, 5.0, valinit=vvo.c_kwargs['lw'])
-    salpha = Slider(axalpha, 'Alpha', 0.0, 1.0, valinit=vvo.c_kwargs['alpha'])
+    sradius = Slider(axradius, 'Radius', 5, 200, valinit=vvo.radius,
+                     valfmt='%d')
+    swindow = Slider(axwindow, 'Window', 5, 500, valinit=vvo.window_radius,
+                     valfmt='%d')
+    slw = Slider(axlw, 'Lw', 0.5, 5.0, valinit=vvo.c_kwargs['lw'],
+                 valfmt='%.1f')
+    salpha = Slider(axalpha, 'Alpha', 0.0, 1.0, valinit=vvo.c_kwargs['alpha'],
+                    valfmt='%.2f')
     sradius.on_changed(vvo.change_control_radius)
     swindow.on_changed(vvo.change_window_radius)
     slw.on_changed(vvo.change_lw)
