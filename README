@@ -34,20 +34,13 @@ Requirements
 
 Installation
 ------------
-You have 2 possibilities when python is installed:
-   1. - Install requirements
-      - Clone or download (ZIP button on git website) the repository
-      - and run "python very-very-orienteering.py -h" for usage information
-      - or make the file very-very-orienteering.py executable
-      - and run "very-very-orienteering.py -h" for usage information
+You have 2 possibilities:
+   1. - Download the file very-very-orienteering.py
+      - And run "python very-very-orienteering.py -h" for usage information
    2. - Clone or download (ZIP button on git website) the repository
-      - Install script and requirements with root privileges and "python setup.py install"
+      - Install script with root privileges: "python setup.py install"
       - Run "very-very-o -h" for usage information
       - If everything is working you can delete the downloaded files
-
-Known bugs and ToDos
---------------------
-See starting comments in file very-very-orienteering.py.
 
 Thanks
 ------

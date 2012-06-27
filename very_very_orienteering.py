@@ -36,8 +36,6 @@ The session can be loaded again by giving the tar filename as argument.
 Be careful, because it will be overridden when changes are saved via Shift-S.
 """
 
-#TODO Line width now changes with figure size -> not practical at all when
-#     exporting maps
 #TODO Possibility to automatically put last control on start with button or
 #     checkbox
 #TODO Possibility to create shortcuts  
