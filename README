@@ -36,11 +36,11 @@ Installation
 ------------
 You have 2 possibilities:
    1. - Download the file very-very-orienteering.py
-      - And run "python very-very-orienteering.py -h" for usage information
-   2. - Clone or download (ZIP button on git website) the repository
-      - Install script with root privileges: "python setup.py install"
-      - Run "very-very-o -h" for usage information
-      - If everything is working you can delete the downloaded files
+      - and run "python very-very-orienteering.py -h" for usage information.
+   2. - Clone or download (ZIP button on git website) the repository,
+      - install the script with "python setup.py install" (with root privileges)
+      - and run "very-very-o -h" for usage information.
+      - If everything is working you can delete the downloadeded files.
 
 Thanks
 ------
