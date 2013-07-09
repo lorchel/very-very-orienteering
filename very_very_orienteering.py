@@ -38,7 +38,8 @@ Be careful, because it will be overridden when changes are saved via Shift-S.
 
 #TODO Possibility to automatically put last control on start with button or
 #     checkbox
-#TODO Possibility to create shortcuts  
+#TODO Possibility to create shortcuts
+#TODO refactor
 
 from __future__ import print_function
 from PIL import Image
@@ -498,7 +499,7 @@ class VeryVeryOrienteering(object):
         """Save tar file with all relevant maps and pickled data"""
         print('Saving in progress .', end='')
         sys.stdout.flush()
-        fn_pickle = filename + '_data.pickle'
+        fn_pickle = filename + '_data.pkl'
         img_ext = '.png'
         fn_im1 = filename + '_map' + img_ext
         fn_im2 = filename + '_route' + img_ext
@@ -562,7 +563,7 @@ class VeryVeryOrienteering(object):
         self.plot_map2()
 
         # Pack all stuff together in a tar file
-        with tarfile.open(filename + '.tar', 'w') as tar:
+        with tarfile.open(filename + '.vvo', 'w') as tar:
             for name in [fn_pickle, fn_im1, fn_im2, fn_im3, fn_im4]:
                 tar.add(name)
         os.remove(fn_pickle)
@@ -589,7 +590,7 @@ class VeryVeryOrienteering(object):
         if tarfile.is_tarfile(filename):
             with tarfile.open(filename) as tar:
                 fn_im = [fn for fn in tar.getnames() if '_map' in fn][0]
-                fn_pickle = [fn for fn in tar.getnames() if fn.endswith('.pickle')][0]
+                fn_pickle = [fn for fn in tar.getnames() if fn.endswith('.pkl')][0]
                 tar.extract(fn_im)
                 tar.extract(fn_pickle)
             self.load_image(fn_im)
@@ -664,7 +665,7 @@ Actions with pylab toolbar:
                         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         'file',
-        help='Filename of picture or tar file previously saved with Shift-S')
+        help='Filename of picture or vvo file previously saved with Shift-S')
     parser.add_argument(
         '-r', '--rotate', action='store_true',
         help='Rotate picture by 90 degrees (ignored with a tar file)')
